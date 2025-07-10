@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../api';
 import { useNavigate } from 'react-router-dom';
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -24,6 +24,7 @@ export default function LoginPage() {
     try {
       const res = await axios.post('/login', formData);
       localStorage.setItem('token', res.data.token);
+      onLogin?.(); // ✅ trigger App recheck
       setSuccess('Login successful! Redirecting...');
       setTimeout(() => navigate('/dashboard'), 1500);
     } catch (err) {

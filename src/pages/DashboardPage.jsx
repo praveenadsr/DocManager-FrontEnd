@@ -2,33 +2,30 @@ import React, { useState, useEffect } from 'react';
 import axios from '../api';
 import { useNavigate } from 'react-router-dom';
 
-export default function DashboardPage() {
+export default function DashboardPage({ onLogout }) {
   const [formData, setFormData] = useState({ name: '', file: null });
   const [documents, setDocuments] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
-
-
-    const navigate = useNavigate();
-
-const handleLogout = () => {
-  localStorage.removeItem('token');
-  navigate('/login');
-};
-
-
-
-
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    onLogout?.(); // ✅ Update app state
+    navigate('/login');
+  };
 
   const fetchDocuments = async () => {
     try {
       const token = localStorage.getItem('token');
+      if (!token) throw new Error("Token not found");
+
       const res = await axios.get('/documents', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDocuments(res.data);
-    } catch {
+    } catch (err) {
+      console.error("Fetch error:", err);
       setError('Failed to fetch documents');
     }
   };
@@ -53,7 +50,6 @@ const handleLogout = () => {
       setError('Please enter a name and select a file');
       return;
     }
-
 
     const data = new FormData();
     data.append('name', formData.name);
@@ -90,16 +86,15 @@ const handleLogout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 p-4 text-white">
       <div className="max-w-2xl mx-auto bg-white text-black rounded-2xl shadow-lg p-8 mt-10">
-       <div className="flex justify-between items-center mb-6">
-  <h2 className="text-3xl font-bold text-indigo-700">📁 Document Dashboard</h2>
-  <button
-    onClick={handleLogout}
-    className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
-  >
-    Logout
-  </button>
-</div>
-
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-indigo-700">📁 Document Dashboard</h2>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1 bg-red-500 text-white text-sm rounded hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+        </div>
 
         {error && <p className="text-red-600 text-sm mb-3">{error}</p>}
         {success && <p className="text-green-600 text-sm mb-3">{success}</p>}
@@ -158,14 +153,15 @@ const handleLogout = () => {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-indigo-600 hover:underline font-medium"
-                  >
-                    View
-                  </a>
+               <a
+  href={`http://localhost:5000/${doc.filePath.replace(/\\/g, '/')}`}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="text-sm text-indigo-600 hover:underline font-medium"
+>
+  View
+</a>
+
                   <button
                     onClick={() => handleDelete(doc._id)}
                     className="text-sm text-red-500 hover:underline font-medium"
