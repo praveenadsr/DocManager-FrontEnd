@@ -71,17 +71,32 @@ export default function DashboardPage({ onLogout }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`/documents/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+
+
+
+
+const handleDelete = async (id) => {
+  try {
+    const token = localStorage.getItem('token');
+    const res = await axios.delete(`/documents/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (res.data?.msg === "Deleted successfully") {
+      setSuccess("Document deleted successfully ✅");
       fetchDocuments();
-    } catch {
-      setError('Failed to delete');
+    } else {
+      setError("Unable to delete document.");
     }
-  };
+  } catch (err) {
+    console.error("Delete error:", err.response?.data || err.message);
+    setError(err.response?.data?.msg || "Delete failed.");
+  }
+};
+
+
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 p-4 text-white">
@@ -153,12 +168,19 @@ export default function DashboardPage({ onLogout }) {
                   </div>
                 </div>
                 <div className="flex gap-4">
-               <a
-  href={`http://localhost:5000/${doc.filePath.replace(/\\/g, '/')}`}
+             
+             
+<a
+  href={doc.fileUrl}
   target="_blank"
   rel="noopener noreferrer"
   className="text-sm text-indigo-600 hover:underline font-medium"
 >
+
+
+
+
+
   View
 </a>
 
