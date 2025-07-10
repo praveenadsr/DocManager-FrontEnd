@@ -5,6 +5,7 @@ import './index.css';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import ProfilePage from './pages/ProfilePage';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
@@ -25,6 +26,9 @@ function App() {
         <Route path="/login" element={isLoggedIn ? <Navigate to="/dashboard" /> : <LoginPage onLogin={() => setIsLoggedIn(true)} />} />
         <Route path="/dashboard" element={isLoggedIn ? <DashboardPage onLogout={() => setIsLoggedIn(false)} /> : <Navigate to="/login" />} />
         <Route path="*" element={<Navigate to="/" />} />
+      <Route path="/profile" element={isLoggedIn ? <ProfilePage /> : <Navigate to="/login" />} />
+
+      
       </Routes>
     </Router>
   );
